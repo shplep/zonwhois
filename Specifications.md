@@ -1,0 +1,88 @@
+# Website Specifications for zonwhois.com
+
+## Frontend Features
+- **Domain**: Hosted at zonwhois.com.
+- **Header**:
+  - Left: Site logo.
+  - Right: Navigation with Home, About Us, Categories, Countries, Contact.
+- **Homepage**:
+  - Three columns:
+    - Last Added Sites: 15 domain URLs (without http/https).
+    - Top Sites: 15 domain URLs (without http/https).
+    - Last Visited Sites: 15 domain URLs (without http/https).
+  - Search bar for quick domain lookup.
+- **Footer**:
+  - Left: Smaller version of top nav (Home, About Us, Categories, Countries, Contact).
+  - Right: Social media icons (X.com, Facebook, YouTube).
+  - Below: A-Z, 0-9 navigation; clicking a letter/number shows paginated list of domains starting with that character.
+- **Domain Pages**:
+  - URL generated for each queried domain (e.g., zonwhois.com/domain/example.com), accessible later.
+  - Displays:
+    - Domain name
+    - Creation date
+    - Expiration date
+    - Last renewal date
+    - Registrar
+    - Meta description
+    - Meta title
+    - Meta keywords
+    - HTTP status code (e.g., 200, 404)
+    - Server type (e.g., Apache, Nginx) from response headers
+    - Content type (e.g., text/html) from headers
+    - Page load time (via cURL execution time)
+    - Redirects (via cURL redirect tracking)
+    - SSL/TLS status (check if HTTPS used)
+- **Additional Frontend**:
+  - Category/Country filter dropdowns or pages.
+  - Custom 404/500 error pages.
+  - Responsive design for mobile/desktop.
+  - Loading indicators for async cURL requests.
+  - ARIA labels and keyboard navigation for accessibility.
+
+## Backend Features (Admin Panel)
+- **URL Management**:
+  - Add, edit, delete, hide URLs.
+- **Domain Refresh**:
+  - Trigger manual refresh of domain data.
+- **Stats Tracking**:
+  - View counts for domain pages (bots vs. non-bots, using User-Agent for bot detection).
+  - Track total domains, views, and query trends.
+  - Export stats as CSV.
+- **Outbound Links**:
+  - Option to make domain names on pages clickable (links to actual domain).
+- **User Feedback**:
+  - Store contact form submissions in database for admin review.
+
+## Technical Requirements
+- **Database Structure**:
+  - Tables:
+    - `domains`: id, domain_name, creation_date, expiration_date, renewal_date, registrar, meta_description, meta_title, meta_keywords, status (visible/hidden), last_updated.
+    - `page_views`: id, domain_id, view_timestamp, is_bot, user_agent.
+    - `categories`: id, name (for categorizing domains).
+    - `countries`: id, name (for country-based filtering).
+    - `contact_submissions`: id, name, email, message, submission_timestamp.
+  - Indexes on domain_name, creation_date, view_timestamp for performance.
+- **Security**:
+  - Admin authentication (username/password, consider 2FA).
+  - Input validation/sanitization to prevent SQL injection/XSS.
+  - Rate limiting on domain queries and page views to avoid abuse.
+  - Secure cURL requests (verify SSL, handle timeouts).
+- **Performance**:
+  - Cache domain data in MySQL to reduce cURL requests (update periodically).
+  - Paginate large domain lists (A-Z, 0-9 pages).
+  - Optimize database queries with indexes.
+  - Use CDN for static assets (logo, CSS, JS).
+- **SEO**:
+  - Clean URLs (e.g., zonwhois.com/domain/example.com).
+  - Auto-generate sitemap.xml for search engine crawling.
+  - Meta tags for all pages (title, description).
+- **Scalability**:
+  - Cron jobs for periodic domain data refresh.
+  - Monitor server load from cURL requests.
+- **Maintenance**:
+  - Log cURL errors for debugging.
+  - Regular database backups.
+- **Legal/Compliance**:
+  - Privacy policy page (data collection, cookies).
+  - GDPR/CCPA compliance for user data.
+  - Terms of use for site and admin actions.

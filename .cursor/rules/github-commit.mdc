@@ -1,0 +1,5 @@
+---
+description:When committing changes to GitHub, limit the commit comments to a single line of simply-formatted text.
+globs:
+alwaysApply: false
+---
