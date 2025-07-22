@@ -6,5 +6,4 @@ require_once 'includes/functions.php';
 header('Content-Type: application/xml; charset=utf-8');
 
 // Generate sitemap
-echo generate_sitemap();
-?> 
+echo generate_sitemap(); 

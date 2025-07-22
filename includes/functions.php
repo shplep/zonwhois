@@ -126,5 +126,4 @@ function create_logs_directory() {
 }
 
 // Initialize logs directory
-create_logs_directory();
-?> 
+create_logs_directory(); 
