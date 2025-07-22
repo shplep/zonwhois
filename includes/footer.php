@@ -8,6 +8,8 @@
                     <li><a href="/categories.php" class="footer-nav-link">Categories</a></li>
                     <li><a href="/countries.php" class="footer-nav-link">Countries</a></li>
                     <li><a href="/contact.php" class="footer-nav-link">Contact</a></li>
+                    <li><a href="/privacy.php" class="footer-nav-link">Privacy Policy</a></li>
+                    <li><a href="/terms.php" class="footer-nav-link">Terms of Use</a></li>
                 </ul>
             </div>
             <div class="footer-alphabet">

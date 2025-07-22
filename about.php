@@ -1,5 +1,6 @@
 <?php
 require_once 'includes/config.php';
+require_once 'includes/functions.php';
 
 $page_title = 'About Us';
 $page_description = 'Learn about ZoneWhois - your trusted source for domain information and WHOIS lookup services.';

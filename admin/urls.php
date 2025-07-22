@@ -98,6 +98,10 @@ include 'admin_header.php';
                         <p>Outbound Link: <strong><?php echo $domain['outbound_link'] ? 'Enabled' : 'Disabled'; ?></strong></p>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
+                        <a href="/domain/<?php echo htmlspecialchars($domain['domain_name']); ?>" target="_blank" class="form-button" style="background: #6f42c1; text-decoration: none; color: white; padding: 0.5rem 1rem; border-radius: 4px; border: none; cursor: pointer;">
+                            View
+                        </a>
+                        
                         <form method="POST" style="display: inline;">
                             <input type="hidden" name="domain_id" value="<?php echo $domain['id']; ?>">
                             <input type="hidden" name="action" value="refresh">

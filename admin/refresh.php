@@ -56,10 +56,15 @@ include 'admin_header.php';
                         <p>Last Updated: <?php echo format_date($domain['last_updated']); ?></p>
                         <p>HTTP Status: <?php echo $domain['http_status'] ?? 'N/A'; ?></p>
                     </div>
-                    <form method="POST">
-                        <input type="hidden" name="domain_id" value="<?php echo $domain['id']; ?>">
-                        <button type="submit" class="form-button" style="background: #28a745;">Refresh Data</button>
-                    </form>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a href="/domain/<?php echo htmlspecialchars($domain['domain_name']); ?>" target="_blank" class="form-button" style="background: #6f42c1; text-decoration: none; color: white; padding: 0.5rem 1rem; border-radius: 4px; border: none; cursor: pointer;">
+                            View
+                        </a>
+                        <form method="POST" style="display: inline;">
+                            <input type="hidden" name="domain_id" value="<?php echo $domain['id']; ?>">
+                            <button type="submit" class="form-button" style="background: #28a745;">Refresh Data</button>
+                        </form>
+                    </div>
                 </div>
             </div>
             <?php endforeach; ?>

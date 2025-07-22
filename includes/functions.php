@@ -42,7 +42,7 @@ function generate_sitemap() {
     $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
     
     // Static pages
-    $static_pages = ['', 'about', 'categories', 'countries', 'contact'];
+    $static_pages = ['', 'about', 'categories', 'countries', 'contact', 'privacy', 'terms'];
     foreach ($static_pages as $page) {
         $url = SITE_URL . '/' . $page;
         $xml .= '  <url>' . "\n";
@@ -127,3 +127,45 @@ function create_logs_directory() {
 
 // Initialize logs directory
 create_logs_directory(); 
+
+// Cache functions for performance optimization
+function get_cache($key) {
+    $cache_file = "cache/" . md5($key) . ".cache";
+    if (file_exists($cache_file)) {
+        $data = file_get_contents($cache_file);
+        $cached = json_decode($data, true);
+        if ($cached && $cached['expires'] > time()) {
+            return $cached['data'];
+        }
+    }
+    return false;
+}
+
+function set_cache($key, $data, $ttl = 300) { // 5 minutes default
+    $cache_dir = "cache";
+    if (!is_dir($cache_dir)) {
+        mkdir($cache_dir, 0755, true);
+    }
+    
+    $cache_file = $cache_dir . "/" . md5($key) . ".cache";
+    $cache_data = [
+        'data' => $data,
+        'expires' => time() + $ttl
+    ];
+    
+    return file_put_contents($cache_file, json_encode($cache_data));
+}
+
+function clear_cache($pattern = null) {
+    $cache_dir = "cache";
+    if (!is_dir($cache_dir)) {
+        return;
+    }
+    
+    $files = glob($cache_dir . "/*.cache");
+    foreach ($files as $file) {
+        if ($pattern === null || strpos($file, $pattern) !== false) {
+            unlink($file);
+        }
+    }
+} 

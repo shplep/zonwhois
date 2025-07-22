@@ -2,17 +2,24 @@
 require_once 'config.php';
 
 function connect_db() {
-    try {
-        $pdo = new PDO(
-            "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME,
-            DB_USER,
-            DB_PASS,
-            array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
-        );
-        return $pdo;
-    } catch (PDOException $e) {
-        die("Database connection failed: " . $e->getMessage());
+    static $pdo = null;
+    
+    if ($pdo === null) {
+        try {
+            $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+            $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_PERSISTENT => true, // Use persistent connections
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
+            ]);
+        } catch (PDOException $e) {
+            log_error("Database connection failed: " . $e->getMessage());
+            die("Database connection failed. Please try again later.");
+        }
     }
+    
+    return $pdo;
 }
 
 function get_domains($type, $limit = 15) {
@@ -246,5 +253,103 @@ function get_human_views() {
     $pdo = connect_db();
     $stmt = $pdo->query("SELECT COUNT(*) FROM page_views WHERE is_bot = 0");
     return $stmt->fetchColumn();
+}
+
+function get_homepage_domains($limit = 15) {
+    $pdo = connect_db();
+    $limit = intval($limit);
+    
+    // Single optimized query to get all three lists
+    $sql = "SELECT 
+                domain_name,
+                id,
+                last_updated,
+                view_count,
+                last_visit,
+                'last_added' as type
+            FROM (
+                SELECT d.*, 0 as view_count, NULL as last_visit
+                FROM domains d 
+                WHERE d.status = 'visible'
+                ORDER BY d.id DESC 
+                LIMIT ?
+            ) as last_added
+            
+            UNION ALL
+            
+            SELECT 
+                domain_name,
+                id,
+                last_updated,
+                view_count,
+                last_visit,
+                'top_sites' as type
+            FROM (
+                SELECT d.*, COUNT(pv.id) as view_count, NULL as last_visit
+                FROM domains d 
+                LEFT JOIN page_views pv ON d.id = pv.domain_id 
+                WHERE d.status = 'visible' 
+                GROUP BY d.id 
+                ORDER BY view_count DESC, d.id DESC 
+                LIMIT ?
+            ) as top_sites
+            
+            UNION ALL
+            
+            SELECT 
+                domain_name,
+                id,
+                last_updated,
+                view_count,
+                last_visit,
+                'last_visited' as type
+            FROM (
+                SELECT d.*, 0 as view_count, MAX(pv.view_timestamp) as last_visit
+                FROM domains d 
+                LEFT JOIN page_views pv ON d.id = pv.domain_id 
+                WHERE d.status = 'visible' 
+                GROUP BY d.id 
+                HAVING last_visit IS NOT NULL
+                ORDER BY last_visit DESC, d.id DESC 
+                LIMIT ?
+            ) as last_visited";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$limit, $limit, $limit]);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Organize results by type
+    $organized = [
+        'last_added' => [],
+        'top_sites' => [],
+        'last_visited' => []
+    ];
+    
+    foreach ($results as $row) {
+        $organized[$row['type']][] = $row;
+    }
+    
+    return $organized;
+}
+
+function get_homepage_domains_prepared($limit = 15) {
+    $pdo = connect_db();
+    $limit = intval($limit);
+    
+    // Prepare all statements once with LIMIT values concatenated
+    $stmt_last_added = $pdo->prepare("SELECT * FROM domains WHERE status = 'visible' ORDER BY id DESC LIMIT " . $limit);
+    $stmt_top_sites = $pdo->prepare("SELECT d.*, COUNT(pv.id) as view_count FROM domains d LEFT JOIN page_views pv ON d.id = pv.domain_id WHERE d.status = 'visible' GROUP BY d.id ORDER BY view_count DESC, d.id DESC LIMIT " . $limit);
+    $stmt_last_visited = $pdo->prepare("SELECT d.*, MAX(pv.view_timestamp) as last_visit FROM domains d LEFT JOIN page_views pv ON d.id = pv.domain_id WHERE d.status = 'visible' GROUP BY d.id HAVING last_visit IS NOT NULL ORDER BY last_visit DESC, d.id DESC LIMIT " . $limit);
+    
+    // Execute all queries
+    $stmt_last_added->execute();
+    $stmt_top_sites->execute();
+    $stmt_last_visited->execute();
+    
+    return [
+        'last_added' => $stmt_last_added->fetchAll(PDO::FETCH_ASSOC),
+        'top_sites' => $stmt_top_sites->fetchAll(PDO::FETCH_ASSOC),
+        'last_visited' => $stmt_last_visited->fetchAll(PDO::FETCH_ASSOC)
+    ];
 }
 ?> 

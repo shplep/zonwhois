@@ -2,6 +2,7 @@
 require_once 'includes/config.php';
 require_once 'includes/db.php';
 require_once 'includes/security.php';
+require_once 'includes/functions.php';
 
 $page_title = 'Contact Us';
 $page_description = 'Get in touch with ZoneWhois. We\'re here to help with any questions about our domain lookup services.';

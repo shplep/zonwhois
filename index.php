@@ -6,10 +6,25 @@ require_once 'includes/functions.php';
 $page_title = 'Home';
 $page_description = 'Domain information and WHOIS lookup service. Search for domain details, creation dates, registrars, and more.';
 
-// Get domain lists
-$last_added = get_domains('last_added', 15);
-$top_sites = get_domains('top', 15);
-$last_visited = get_domains('last_visited', 15);
+// Try to get cached results first
+$cache_key = 'homepage_domains_' . date('Y-m-d-H-i'); // Cache by 5-minute intervals
+$cached_results = get_cache($cache_key);
+
+if ($cached_results) {
+    $last_added = $cached_results['last_added'];
+    $top_sites = $cached_results['top_sites'];
+    $last_visited = $cached_results['last_visited'];
+} else {
+    // Use optimized function with single database connection and prepared statements
+    $results = get_homepage_domains_prepared(15);
+    
+    $last_added = $results['last_added'];
+    $top_sites = $results['top_sites'];
+    $last_visited = $results['last_visited'];
+    
+    // Cache the results for 5 minutes
+    set_cache($cache_key, $results, 300);
+}
 
 include 'includes/header.php';
 ?>

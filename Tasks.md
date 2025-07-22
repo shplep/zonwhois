@@ -186,6 +186,13 @@ This document outlines the files, functions, database schema, and tasks required
 - Optimize queries with indexes.
 - Leverage Cloudflare for asset delivery (`assets/` folder).
 - Implement pagination (`generate_pagination()`).
+- **Database Optimizations** ✅:
+  - Single database connection with persistent connections.
+  - Prepared statements for all queries.
+  - File-based caching system (5-minute TTL).
+  - Performance indexes on all critical columns.
+  - Optimized homepage queries with combined results.
+  - Admin cache management interface.
 
 ### 7. SEO ✅
 - Enable clean URLs via `.htaccess` (e.g., `/domain/example.com`).
@@ -202,12 +209,9 @@ This document outlines the files, functions, database schema, and tasks required
 - Schedule daily database backups.
 - Monitor database size and optimize tables.
 
-### 10. Legal/Compliance ⚠️
-- **Privacy Policy** (`privacy.php`):
-  - Detail data collection (views, contact forms).
-  - Comply with GDPR/CCPA.
-- **Terms of Use** (`terms.php`):
-  - Outline site and admin usage rules.
+### 10. Legal/Compliance ✅
+- **Privacy Policy** (`privacy.php`): ✅ Detail data collection (views, contact forms), comply with GDPR/CCPA.
+- **Terms of Use** (`terms.php`): ✅ Outline site and admin usage rules.
 
 ### 11. Assets ✅
 - Use provided `logo.png`.

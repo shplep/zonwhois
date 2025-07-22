@@ -83,6 +83,7 @@
                     <a href="urls.php">Domains</a>
                     <a href="stats.php">Statistics</a>
                     <a href="contact.php">Contact</a>
+                    <a href="clear_cache.php">Cache</a>
                     <a href="logout.php">Logout</a>
                 </nav>
             </div>
