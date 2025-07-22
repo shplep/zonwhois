@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'db.php';
 
 function sanitize_input($input) {
     if (is_array($input)) {
