@@ -125,41 +125,8 @@ function add_domain($data) {
     
     $sql = "INSERT INTO domains (domain_name, creation_date, expiration_date, renewal_date, 
             registrar, meta_description, meta_title, meta_keywords, http_status, server_type, 
-            content_type, load_time, redirects, ssl_status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    
-    $stmt = $pdo->prepare($sql);
-    return $stmt->execute([
-        $data['domain_name'],
-        $data['creation_date'] ?? null,
-        $data['expiration_date'] ?? null,
-        $data['renewal_date'] ?? null,
-        $data['registrar'] ?? null,
-        $data['meta_description'] ?? null,
-        $data['meta_title'] ?? null,
-        $data['meta_keywords'] ?? null,
-        $http_status,
-        $data['server_type'] ?? null,
-        $data['content_type'] ?? null,
-        $load_time,
-        $data['redirects'] ?? null,
-        $ssl_status
-    ]);
-}
-
-function update_domain($id, $data) {
-    $pdo = connect_db();
-    
-    // Ensure proper data types
-    $ssl_status = !empty($data['ssl_status']) ? 1 : 0;
-    $http_status = !empty($data['http_status']) ? intval($data['http_status']) : null;
-    $load_time = !empty($data['load_time']) ? floatval($data['load_time']) : null;
-    
-    $sql = "UPDATE domains SET 
-            domain_name = ?, creation_date = ?, expiration_date = ?, renewal_date = ?,
-            registrar = ?, meta_description = ?, meta_title = ?, meta_keywords = ?,
-            http_status = ?, server_type = ?, content_type = ?, load_time = ?,
-            redirects = ?, ssl_status = ? WHERE id = ?";
+            content_type, load_time, redirects, ssl_status, outbound_link) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     $stmt = $pdo->prepare($sql);
     return $stmt->execute([
@@ -177,6 +144,41 @@ function update_domain($id, $data) {
         $load_time,
         $data['redirects'] ?? null,
         $ssl_status,
+        $data['outbound_link'] ?? true
+    ]);
+}
+
+function update_domain($id, $data) {
+    $pdo = connect_db();
+    
+    // Ensure proper data types
+    $ssl_status = !empty($data['ssl_status']) ? 1 : 0;
+    $http_status = !empty($data['http_status']) ? intval($data['http_status']) : null;
+    $load_time = !empty($data['load_time']) ? floatval($data['load_time']) : null;
+    
+    $sql = "UPDATE domains SET 
+            domain_name = ?, creation_date = ?, expiration_date = ?, renewal_date = ?,
+            registrar = ?, meta_description = ?, meta_title = ?, meta_keywords = ?,
+            http_status = ?, server_type = ?, content_type = ?, load_time = ?,
+            redirects = ?, ssl_status = ?, outbound_link = ? WHERE id = ?";
+    
+    $stmt = $pdo->prepare($sql);
+    return $stmt->execute([
+        $data['domain_name'],
+        $data['creation_date'] ?? null,
+        $data['expiration_date'] ?? null,
+        $data['renewal_date'] ?? null,
+        $data['registrar'] ?? null,
+        $data['meta_description'] ?? null,
+        $data['meta_title'] ?? null,
+        $data['meta_keywords'] ?? null,
+        $http_status,
+        $data['server_type'] ?? null,
+        $data['content_type'] ?? null,
+        $load_time,
+        $data['redirects'] ?? null,
+        $ssl_status,
+        $data['outbound_link'] ?? true,
         $id
     ]);
 }
@@ -191,6 +193,12 @@ function hide_domain($id, $status) {
     $pdo = connect_db();
     $stmt = $pdo->prepare("UPDATE domains SET status = ? WHERE id = ?");
     return $stmt->execute([$status, $id]);
+}
+
+function toggle_outbound_link($id) {
+    $pdo = connect_db();
+    $stmt = $pdo->prepare("UPDATE domains SET outbound_link = NOT outbound_link WHERE id = ?");
+    return $stmt->execute([$id]);
 }
 
 function save_contact_submission($data) {

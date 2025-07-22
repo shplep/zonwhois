@@ -29,6 +29,7 @@ try {
             load_time FLOAT NULL,
             redirects TEXT NULL,
             ssl_status BOOLEAN DEFAULT FALSE,
+            outbound_link BOOLEAN DEFAULT TRUE,
             status ENUM('visible', 'hidden') DEFAULT 'visible',
             last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             INDEX idx_domain_name (domain_name),

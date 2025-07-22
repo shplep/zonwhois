@@ -156,9 +156,11 @@ include 'includes/header.php';
         <?php endif; ?>
         
         <div class="domain-actions">
+            <?php if ($domain['outbound_link']): ?>
             <a href="http://<?php echo htmlspecialchars($domain_name); ?>" target="_blank" class="form-button">
                 Visit Website
             </a>
+            <?php endif; ?>
             <a href="/" class="form-button" style="background: #6c757d;">
                 Search Another Domain
             </a>

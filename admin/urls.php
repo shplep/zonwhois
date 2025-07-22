@@ -47,6 +47,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message_type = 'error';
             }
             break;
+            
+        case 'toggle_outbound':
+            if (toggle_outbound_link($domain_id)) {
+                $message = 'Outbound link status updated successfully.';
+                $message_type = 'success';
+            } else {
+                $message = 'Failed to update outbound link status.';
+                $message_type = 'error';
+            }
+            break;
     }
 }
 
@@ -85,12 +95,21 @@ include 'admin_header.php';
                         <h3><?php echo htmlspecialchars($domain['domain_name']); ?></h3>
                         <p>Status: <?php echo $domain['status']; ?> | Views: <?php echo get_domain_views($domain['id']); ?></p>
                         <p>Last Updated: <?php echo format_date($domain['last_updated']); ?></p>
+                        <p>Outbound Link: <strong><?php echo $domain['outbound_link'] ? 'Enabled' : 'Disabled'; ?></strong></p>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
                         <form method="POST" style="display: inline;">
                             <input type="hidden" name="domain_id" value="<?php echo $domain['id']; ?>">
                             <input type="hidden" name="action" value="refresh">
                             <button type="submit" class="form-button" style="background: #28a745;">Refresh</button>
+                        </form>
+                        
+                        <form method="POST" style="display: inline;">
+                            <input type="hidden" name="domain_id" value="<?php echo $domain['id']; ?>">
+                            <input type="hidden" name="action" value="toggle_outbound">
+                            <button type="submit" class="form-button" style="background: #17a2b8;">
+                                <?php echo $domain['outbound_link'] ? 'Disable Link' : 'Enable Link'; ?>
+                            </button>
                         </form>
                         
                         <form method="POST" style="display: inline;">
