@@ -118,6 +118,11 @@ function log_view($domain_id, $user_agent) {
 function add_domain($data) {
     $pdo = connect_db();
     
+    // Ensure proper data types
+    $ssl_status = !empty($data['ssl_status']) ? 1 : 0;
+    $http_status = !empty($data['http_status']) ? intval($data['http_status']) : null;
+    $load_time = !empty($data['load_time']) ? floatval($data['load_time']) : null;
+    
     $sql = "INSERT INTO domains (domain_name, creation_date, expiration_date, renewal_date, 
             registrar, meta_description, meta_title, meta_keywords, http_status, server_type, 
             content_type, load_time, redirects, ssl_status) 
@@ -133,17 +138,22 @@ function add_domain($data) {
         $data['meta_description'] ?? null,
         $data['meta_title'] ?? null,
         $data['meta_keywords'] ?? null,
-        $data['http_status'] ?? null,
+        $http_status,
         $data['server_type'] ?? null,
         $data['content_type'] ?? null,
-        $data['load_time'] ?? null,
+        $load_time,
         $data['redirects'] ?? null,
-        $data['ssl_status'] ?? false
+        $ssl_status
     ]);
 }
 
 function update_domain($id, $data) {
     $pdo = connect_db();
+    
+    // Ensure proper data types
+    $ssl_status = !empty($data['ssl_status']) ? 1 : 0;
+    $http_status = !empty($data['http_status']) ? intval($data['http_status']) : null;
+    $load_time = !empty($data['load_time']) ? floatval($data['load_time']) : null;
     
     $sql = "UPDATE domains SET 
             domain_name = ?, creation_date = ?, expiration_date = ?, renewal_date = ?,
@@ -161,12 +171,12 @@ function update_domain($id, $data) {
         $data['meta_description'] ?? null,
         $data['meta_title'] ?? null,
         $data['meta_keywords'] ?? null,
-        $data['http_status'] ?? null,
+        $http_status,
         $data['server_type'] ?? null,
         $data['content_type'] ?? null,
-        $data['load_time'] ?? null,
+        $load_time,
         $data['redirects'] ?? null,
-        $data['ssl_status'] ?? false,
+        $ssl_status,
         $id
     ]);
 }

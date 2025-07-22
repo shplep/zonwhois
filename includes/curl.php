@@ -22,6 +22,9 @@ function fetch_domain_data($domain) {
         $data = array_merge($data, $https_data);
     }
     
+    // Ensure ssl_status is always a boolean
+    $data['ssl_status'] = (bool)$data['ssl_status'];
+    
     return $data;
 }
 
