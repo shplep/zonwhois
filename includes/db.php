@@ -17,10 +17,11 @@ function connect_db() {
 
 function get_domains($type, $limit = 15) {
     $pdo = connect_db();
+    $limit = intval($limit); // Ensure it's an integer
     
     switch ($type) {
         case 'last_added':
-            $sql = "SELECT * FROM domains WHERE status = 'visible' ORDER BY id DESC LIMIT ?";
+            $sql = "SELECT * FROM domains WHERE status = 'visible' ORDER BY id DESC LIMIT " . $limit;
             break;
         case 'top':
             $sql = "SELECT d.*, COUNT(pv.id) as view_count 
@@ -29,7 +30,7 @@ function get_domains($type, $limit = 15) {
                    WHERE d.status = 'visible' 
                    GROUP BY d.id 
                    ORDER BY view_count DESC, d.id DESC 
-                   LIMIT ?";
+                   LIMIT " . $limit;
             break;
         case 'last_visited':
             $sql = "SELECT d.*, MAX(pv.view_timestamp) as last_visit 
@@ -38,14 +39,14 @@ function get_domains($type, $limit = 15) {
                    WHERE d.status = 'visible' 
                    GROUP BY d.id 
                    ORDER BY last_visit DESC, d.id DESC 
-                   LIMIT ?";
+                   LIMIT " . $limit;
             break;
         default:
             return [];
     }
     
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$limit]);
+    $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -58,15 +59,17 @@ function get_domain($domain_name) {
 
 function get_domains_by_letter($letter, $page = 1, $per_page = DOMAINS_PER_PAGE) {
     $pdo = connect_db();
+    $page = intval($page);
+    $per_page = intval($per_page);
     $offset = ($page - 1) * $per_page;
     
     $sql = "SELECT * FROM domains 
             WHERE domain_name LIKE ? AND status = 'visible' 
             ORDER BY domain_name 
-            LIMIT ? OFFSET ?";
+            LIMIT " . $per_page . " OFFSET " . $offset;
     
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$letter . '%', $per_page, $offset]);
+    $stmt->execute([$letter . '%']);
     
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -188,10 +191,12 @@ function save_contact_submission($data) {
 
 function get_contact_submissions($page = 1, $per_page = ADMIN_ITEMS_PER_PAGE) {
     $pdo = connect_db();
+    $page = intval($page);
+    $per_page = intval($per_page);
     $offset = ($page - 1) * $per_page;
     
-    $stmt = $pdo->prepare("SELECT * FROM contact_submissions ORDER BY submission_timestamp DESC LIMIT ? OFFSET ?");
-    $stmt->execute([$per_page, $offset]);
+    $stmt = $pdo->prepare("SELECT * FROM contact_submissions ORDER BY submission_timestamp DESC LIMIT " . $per_page . " OFFSET " . $offset);
+    $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 

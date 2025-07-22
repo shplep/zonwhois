@@ -54,8 +54,10 @@ $page = max(1, intval($_GET['page'] ?? 1));
 $offset = ($page - 1) * ADMIN_ITEMS_PER_PAGE;
 
 $pdo = connect_db();
-$stmt = $pdo->prepare("SELECT * FROM domains ORDER BY id DESC LIMIT ? OFFSET ?");
-$stmt->execute([ADMIN_ITEMS_PER_PAGE, $offset]);
+$per_page = intval(ADMIN_ITEMS_PER_PAGE);
+$offset = intval($offset);
+$stmt = $pdo->prepare("SELECT * FROM domains ORDER BY id DESC LIMIT " . $per_page . " OFFSET " . $offset);
+$stmt->execute();
 $domains = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $total_domains = get_total_domains();

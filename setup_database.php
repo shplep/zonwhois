@@ -76,10 +76,10 @@ try {
         
         "CREATE TABLE IF NOT EXISTS domain_countries (
             domain_id INT NOT NULL,
-            category_id INT NOT NULL,
-            PRIMARY KEY (domain_id, category_id),
+            country_id INT NOT NULL,
+            PRIMARY KEY (domain_id, country_id),
             FOREIGN KEY (domain_id) REFERENCES domains(id) ON DELETE CASCADE,
-            FOREIGN KEY (category_id) REFERENCES countries(id) ON DELETE CASCADE
+            FOREIGN KEY (country_id) REFERENCES countries(id) ON DELETE CASCADE
         )"
     ];
     
